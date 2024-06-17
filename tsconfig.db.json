@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "ES2020", // Especifica a versão do JavaScript que será gerada
+    "module": "commonjs", // Especifica o sistema de módulos
+    "strict": true, // Habilita todas as verificações de tipo estritas
+    "esModuleInterop": true, // Habilita interoperabilidade com módulos ES
+    "skipLibCheck": true, // Pula checagem de tipos em arquivos de definição
+    "forceConsistentCasingInFileNames": true, // Enforce consistent casing in file names
+    "outDir": "./dist"
+  },
+  "include": ["seed.ts", "clean.ts"],
+  "exclude": ["node_modules"]
+}
