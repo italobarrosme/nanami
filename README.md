@@ -1,9 +1,9 @@
 <p align="center">
   <a href="" rel="noopener">
- <img width=90px height=90px src="./public/logo_coqueirodigital.png" alt="logo"></a>
+ <img width=90px height=90px src="" alt="logo"></a>
 </p>
 
-<h3 align="center">NEXTJS Boilerplate</h3>
+<h3 align="center"></h3>
 
 ## 📝 Table of Contents
 
@@ -31,12 +31,4 @@
 
 ## 🔦 Instructions for installing the boilerplate. <a name="getting_started">
 
-```
-npx create-next-app@latest -e https://github.com/italobarrosme/nezuko
-```
-
-Run
-
-```
-npm run dev
-```
+-

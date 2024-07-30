@@ -1,4 +1,4 @@
-import { Text } from '@coqueirodigital/react-components'
+import { Text } from '@developerskyi/react-components'
 
 export default async function Home() {
   return (
