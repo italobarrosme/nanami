@@ -10,18 +10,80 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
 model User {
   id            String       @default(cuid()) @id
   createdAt     DateTime  @default(now()) @map(name: "created_at")
   updatedAt     DateTime  @updatedAt @map(name: "updated_at")
   createdBy     String?      @map(name: "created_by")
   updatedBy     String?      @map(name: "updated_by")
-  name          String?
-  email         String?   @unique
-  password      String?
+  name          String
+  email         String   @unique
+  emailVerified DateTime?
+  password      String
+
   budgets        BudgetUser[]
+  habits         HabitUser[]
+  networks       NetworkUser[]
+  accounts      Account[]
+  sessions      Session[]
   
   @@map(name: "users")
+}
+
+model HabitUser {
+  habitId      String
+  userId       String
+  user         User         @relation(fields: [userId], references: [id])
+  habit        Habit        @relation(fields: [habitId], references: [id])
+  
+  @@id([habitId, userId])
+  @@map("habit_users")
+}
+
+model NetworkUser {
+  networkId      String
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+  network        Network      @relation(fields: [networkId], references: [id])
+  
+  @@id([networkId, userId])
+  @@map("network_users")
 }
 
 model BudgetUser {
@@ -39,10 +101,11 @@ model Budget {
   updatedAt     DateTime  @updatedAt @map(name: "updated_at")
   createdBy     String?      @map(name: "created_by")
   updatedBy     String?      @map(name: "updated_by")
+  name         String
+  description  String
   users         BudgetUser[]
   pillars       Pillar[]
-  categoryId   String
-  category     Category   @relation(fields: [categoryId], references: [id])
+  
 
   @@map(name: "budgets")
 
@@ -54,9 +117,9 @@ model Category {
   updatedAt     DateTime  @updatedAt @map(name: "updated_at")
   createdBy     String?      @map(name: "created_by")
   updatedBy     String?      @map(name: "updated_by")
-  name         String?
-  description  String?
-  budgets      Budget[]
+  name         String
+  description  String
+  pillar      Pillar[]
   
   @@map(name: "categories")
 }
@@ -67,11 +130,13 @@ model Pillar {
   updatedAt     DateTime  @updatedAt @map(name: "updated_at")
   createdBy     String?      @map(name: "created_by")
   updatedBy     String?      @map(name: "updated_by")
-  name         String?
+  name         String
   budgetId     String
   budget       Budget     @relation(fields: [budgetId], references: [id])
   expenses     Expense[]
   incomes      Income[]
+  categoryId   String
+  category    Category   @relation(fields: [categoryId], references: [id])
   
   @@map(name: "pillars")
 
@@ -83,12 +148,12 @@ model Expense {
   updatedAt     DateTime  @updatedAt @map(name: "updated_at")
   createdBy     String?      @map(name: "created_by")
   updatedBy     String?      @map(name: "updated_by")
-  date         DateTime?  @default(now())
-  source         String?
-  amount        Decimal?
+  date         DateTime  @default(now())
+  source         String
+  amount        Decimal
   paymentType    PaymentType
-  installmentNumber   Int?      @default(1)
-  totalInstallments   Int?      @default(1)
+  installmentNumber   Int      @default(1)
+  totalInstallments   Int      @default(1)
   paymentMethod  PaymentMethod
   pillarId      String
   pillar        Pillar     @relation(fields: [pillarId], references: [id])
@@ -103,17 +168,50 @@ model Income {
   updatedAt     DateTime  @updatedAt @map(name: "updated_at")
   createdBy     String?      @map(name: "created_by")
   updatedBy     String?      @map(name: "updated_by")
-  date         DateTime?  @default(now())
-  source         String?
-  amount        Decimal?
+  date         DateTime  @default(now())
+  source         String
+  amount        Decimal
   paymentType    PaymentType
-  installmentNumber     Int?      @default(1)
-  totalInstallments     Int?      @default(1)
+  installmentNumber     Int      @default(1)
+  totalInstallments     Int      @default(1)
   paymentMethod   PaymentMethod
   pillarId      String
   pillar        Pillar     @relation(fields: [pillarId], references: [id])
   
   @@map(name: "incomes")
+}
+
+model Habit {
+  id         String       @default(cuid()) @id
+  createdAt     DateTime  @default(now()) @map(name: "created_at")
+  updatedAt     DateTime  @updatedAt @map(name: "updated_at")
+  createdBy     String?      @map(name: "created_by")
+  updatedBy     String?      @map(name: "updated_by")
+  name         String
+  description  String
+  trigger      String
+  reward       String
+  habitType    HabitType
+  users        HabitUser[]
+  
+  @@map(name: "habits")
+}
+
+model Network {
+  id         String       @default(cuid()) @id
+  createdAt     DateTime  @default(now()) @map(name: "created_at")
+  updatedAt     DateTime  @updatedAt @map(name: "updated_at")
+  createdBy     String?      @map(name: "created_by")
+  updatedBy     String?      @map(name: "updated_by")
+  name         String
+  description  String
+  emails       String[]
+  numberContacts   String[]
+  toBenefit    String
+  toServe    String
+  users        NetworkUser[]
+  
+  @@map(name: "networks")
 }
 
 enum PaymentType {
@@ -127,4 +225,9 @@ enum PaymentMethod {
   CREDIT
   PIX
   OTHER
+}
+
+enum HabitType {
+  POSITIVE
+  NEGATIVE
 }

@@ -5,14 +5,18 @@ const prisma = new PrismaClient()
 
 async function clean() {
   try {
-    // Deletar registros de tabelas com dependências de chave estrangeira primeiro
+    // Delete all data from the database
     await prisma.expense.deleteMany({})
     await prisma.income.deleteMany({})
     await prisma.pillar.deleteMany({})
     await prisma.budgetUser.deleteMany({})
     await prisma.budget.deleteMany({})
-    await prisma.user.deleteMany({})
     await prisma.category.deleteMany({})
+    await prisma.habitUser.deleteMany({})
+    await prisma.habit.deleteMany({})
+    await prisma.networkUser.deleteMany({})
+    await prisma.network.deleteMany({})
+    await prisma.user.deleteMany({})
 
     getCustomLog({
       log: 'Database cleaned successfully',
