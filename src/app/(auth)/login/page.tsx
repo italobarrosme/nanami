@@ -1,11 +1,9 @@
-import { Text } from '@developerskyi/react-components'
+import { Auth } from '@/modules/auth/Auth'
 
 export default async function Login() {
   return (
-    <>
-      <section className="flex max-w-5xl flex-col gap-16 text-primary-regular">
-        <Text>Login</Text>
-      </section>
-    </>
+    <section className="flex min-h-screen w-screen flex-col items-center justify-center">
+      <Auth />
+    </section>
   )
 }
