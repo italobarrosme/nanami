@@ -15,7 +15,12 @@ export const LoginForm = () => {
       onSubmit={handleSubmit((data) => console.log(data))}
       className="flex flex-col gap-4"
     >
-      <InputText label="E-mail" type="email" {...register('email')} />
+      <InputText
+        label="E-mail"
+        className="min-w-56"
+        type="email"
+        {...register('email')}
+      />
       <InputText label="Senha" type="password" {...register('password')} />
       <Button variant="full/regular" type="submit">
         Entrar
